@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+@theme {
+  /* Background layers */
+  --color-tl-bg: #080c14;
+  --color-tl-panel: #0d1326;
+  --color-tl-surface: #0f1932;
+  --color-tl-line: #1a2340;
+  --color-tl-card: #111827;
+
+  /* Accent palette */
+  --color-tl-blue: #4f8ef7;
+  --color-tl-blue-light: #7aaeff;
+  --color-tl-purple: #818cf8;
+  --color-tl-green: #34d399;
+  --color-tl-red: #f87171;
+  --color-tl-orange: #fb923c;
+  --color-tl-amber: #fbbf24;
+
+  /* Legacy aliases (kept for backward compat in services) */
+  --color-tl-cyan: #4f8ef7;
+
+  /* Text */
+  --color-tl-text: #e2e8f0;
+  --color-tl-text-dim: #94a3b8;
+  --color-tl-muted: #64748b;
+
+  /* Fonts */
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+
+  /* Sidebar */
+  --sidebar-w: 240px;
+}
+
+:root {
+  color-scheme: dark;
+  background: #080c14;
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #080c14;
+  min-height: 100svh;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+::selection {
+  background: rgba(79, 142, 247, 0.25);
+}
+
+/* ── Scrollbar ─────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080c14;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a2340;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #243060;
+}
+
+/* ── Animations ────────────────────────────── */
+@keyframes gridPan {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: calc(var(--tile) * 10) calc(var(--tile) * 10), 0 0; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(3200%); opacity: 0; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 16px rgba(79, 142, 247, 0.2); }
+  50% { box-shadow: 0 0 32px rgba(79, 142, 247, 0.5); }
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Glassmorphism card ────────────────────── */
+.glass-card {
+  background: linear-gradient(135deg, rgba(15, 25, 50, 0.8) 0%, rgba(11, 19, 38, 0.9) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(79, 142, 247, 0.12);
+  border-radius: 16px;
+}
+
+/* ── Sidebar layout ────────────────────────── */
+.layout-root {
+  display: flex;
+  min-height: 100svh;
+}
+
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100svh;
+  flex-shrink: 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0d1326 0%, #080c14 100%);
+  border-right: 1px solid #1a2340;
+  z-index: 40;
+  overflow-y: auto;
+}
+
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100svh;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid #1a2340;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .layout-root {
+    flex-direction: column;
+  }
+}
