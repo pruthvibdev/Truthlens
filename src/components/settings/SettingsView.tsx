@@ -13,8 +13,10 @@ import {
   ShieldCheck,
   AlertCircle,
   ExternalLink,
+  Terminal,
 } from 'lucide-react'
 import { testConnection } from '../../services/gemini'
+import { isBackendAvailable, BACKEND_URL } from '../../services/backend'
 
 const AVAILABLE_MODELS = [
   {
@@ -68,6 +70,16 @@ export default function SettingsView({
     message: string
     latency?: number
   } | null>(null)
+
+  const [checkingBackend, setCheckingBackend] = useState(false)
+  const [backendOnline, setBackendOnline] = useState<boolean | null>(null)
+
+  async function handleCheckBackend() {
+    setCheckingBackend(true)
+    const online = await isBackendAvailable()
+    setBackendOnline(online)
+    setCheckingBackend(false)
+  }
 
   function handleSave() {
     onSave({ apiKey: apiKey.trim(), model, temperature })
@@ -256,6 +268,52 @@ export default function SettingsView({
             <span>0.0 (Deterministic)</span>
             <span>0.5 (Balanced)</span>
             <span>1.0 (Creative)</span>
+          </div>
+        </div>
+
+        {/* ── Python Agent Backend ── */}
+        <div className="glass-card p-6">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Terminal size={16} className="text-tl-blue" />
+              <h3 className="font-display text-sm font-semibold text-white">Python Agent Backend</h3>
+            </div>
+            <span className="font-mono text-[11px] text-tl-muted">
+              {BACKEND_URL}
+            </span>
+          </div>
+
+          <p className="font-sans text-xs text-tl-muted mb-3 leading-relaxed">
+            TruthLens includes an optional high-performance Python FastAPI agent backend with DuckDuckGo live web grounding.
+            When running (<code className="text-tl-blue bg-tl-blue/10 px-1 rounded font-mono">python run.py</code> in{' '}
+            <code className="text-tl-blue bg-tl-blue/10 px-1 rounded font-mono">backend/</code>), TruthLens automatically delegates verification pipeline execution to Python.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <button
+              onClick={handleCheckBackend}
+              disabled={checkingBackend}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-tl-line hover:border-tl-blue/40 text-tl-text text-xs font-sans font-medium transition-all disabled:opacity-50"
+            >
+              <RefreshCw size={12} className={checkingBackend ? 'animate-spin text-tl-blue' : ''} />
+              {checkingBackend ? 'Checking...' : 'Check Backend Status'}
+            </button>
+
+            {backendOnline !== null && (
+              <div
+                className={`flex items-center gap-1.5 font-mono text-[11px] px-3 py-1 rounded-lg ${
+                  backendOnline
+                    ? 'bg-tl-green/10 text-tl-green border border-tl-green/30'
+                    : 'bg-white/5 text-tl-muted border border-tl-line'
+                }`}
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: backendOnline ? '#34d399' : '#64748b' }}
+                />
+                {backendOnline ? 'Python Backend Online & Active' : 'Offline (Using browser fallback)'}
+              </div>
+            )}
           </div>
         </div>
 

@@ -17,6 +17,7 @@ import {
   runSentinel,
   runVerdict,
 } from './services/gemini'
+import { isBackendAvailable, analyzeWithPythonBackend } from './services/backend'
 import { extractTextFromImage, terminateOcrWorker } from './utils/ocr'
 import { fetchUrlText } from './utils/url'
 import type {
@@ -228,20 +229,33 @@ function App() {
           }
         }
 
-        onStart('oracle')
-        const oracle = await runOracle(inputText, onLog)
-        onDone('oracle')
+        let finalResult: AnalysisResult
 
-        onStart('sentinel')
-        const sentinel = await runSentinel(oracle, onLog)
-        onDone('sentinel')
+        const hasBackend = await isBackendAvailable()
+        if (hasBackend) {
+          finalResult = await analyzeWithPythonBackend(inputText, mode, {
+            onLog,
+            onStart,
+            onDone,
+            onFail,
+          })
+        } else {
+          onStart('oracle')
+          const oracle = await runOracle(inputText, onLog)
+          onDone('oracle')
 
-        onStart('verdict')
-        const verdict = await runVerdict(oracle, sentinel, onLog)
-        onDone('verdict')
+          onStart('sentinel')
+          const sentinel = await runSentinel(oracle, onLog)
+          onDone('sentinel')
+
+          onStart('verdict')
+          const verdict = await runVerdict(oracle, sentinel, onLog)
+          onDone('verdict')
+
+          finalResult = { oracle, sentinel, verdict }
+        }
 
         if (runId === runIdRef.current) {
-          const finalResult: AnalysisResult = { oracle, sentinel, verdict }
           setResult(finalResult)
 
           // Save to history automatically
@@ -249,7 +263,7 @@ function App() {
             id: String(Date.now()),
             timestamp: Date.now(),
             inputMode: mode,
-            claim: oracle.claim || inputText,
+            claim: finalResult.oracle.claim || inputText,
             result: finalResult,
           }
           setHistory((prev) => [newHistoryItem, ...prev.slice(0, 49)])

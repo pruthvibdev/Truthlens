@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Clock, Trash2, ArrowUpRight, ArrowLeft, ShieldAlert, CheckCircle2, AlertTriangle, XCircle, HelpCircle } from 'lucide-react'
+import { Clock, Trash2, ArrowUpRight, ArrowLeft, CheckCircle2, AlertTriangle, XCircle, HelpCircle } from 'lucide-react'
 import type { AnalysisResult } from '../../types'
 import { verdictColor } from '../../types'
 
