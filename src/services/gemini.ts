@@ -17,9 +17,14 @@ export const DEFAULT_TEMPERATURE = 0.2
 export function getEffectiveApiKey(): string | undefined {
   if (typeof window !== 'undefined') {
     const custom = localStorage.getItem('truthlens_api_key')
-    if (custom && custom.trim()) return custom.trim()
+    if (custom && custom.trim() && custom.trim() !== 'your_groq_api_key_here') {
+      return custom.trim()
+    }
   }
-  return DEFAULT_API_KEY
+  if (DEFAULT_API_KEY && DEFAULT_API_KEY.trim() && DEFAULT_API_KEY.trim() !== 'your_groq_api_key_here') {
+    return DEFAULT_API_KEY.trim()
+  }
+  return undefined
 }
 
 export function getEffectiveModel(): string {

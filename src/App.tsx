@@ -240,6 +240,11 @@ function App() {
             onFail,
           })
         } else {
+          const currentKey = getEffectiveApiKey()
+          if (!currentKey) {
+            throw new Error('MISSING_KEY')
+          }
+
           onStart('oracle')
           const oracle = await runOracle(inputText, onLog)
           onDone('oracle')
@@ -273,12 +278,16 @@ function App() {
         setAgents((prev) =>
           prev.map((a) => (a.status === 'processing' ? { ...a, status: 'error' } : a)),
         )
-        const msg =
-          err instanceof Error
-            ? err.message === 'MISSING_KEY'
-              ? 'Groq API key missing — configure in Settings or add to .env.local'
-              : err.message
-            : 'Analysis pipeline failed'
+        let msg = 'Analysis pipeline failed'
+        if (err instanceof Error) {
+          if (err.message === 'MISSING_KEY') {
+            msg = 'Groq API key not configured. Please enter your free key in Settings, or start the Python backend in backend/.'
+          } else if (err.message === 'Failed to fetch') {
+            msg = 'Network connection failed (Failed to fetch). Please check your internet, verify your Groq API key in Settings, or make sure the Python backend is running.'
+          } else {
+            msg = err.message
+          }
+        }
         setError(msg)
       } finally {
         if (runId === runIdRef.current) setBusy(false)
