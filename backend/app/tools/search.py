@@ -27,8 +27,12 @@ class SearchTool:
     def _sync_search(cls, query: str, max_results: int = 4) -> List[Dict[str, str]]:
         results = []
         try:
-            # Attempt DuckDuckGo search
-            from duckduckgo_search import DDGS
+            # Attempt DDGS search
+            try:
+                from ddgs import DDGS
+            except ImportError:
+                from duckduckgo_search import DDGS
+
             with DDGS() as ddgs:
                 raw_results = list(ddgs.text(query, max_results=max_results))
                 for r in raw_results:
